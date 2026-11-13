@@ -1,0 +1,489 @@
+---
+import { getImage } from 'astro:assets';
+import Layout from '../layouts/Layout.astro';
+import TrabajoCard from '../components/TrabajoCard.astro';
+import { trabajosOrdenados } from '../lib/trabajos';
+
+const trabajos = await trabajosOrdenados();
+const categorias = [...new Set(trabajos.map((t) => t.data.categoria))].sort((a, b) => a.localeCompare(b, 'es'));
+
+// Versión grande de cada foto para el visor (varios tamaños, formato moderno)
+const grandes = await Promise.all(
+  trabajos.map((t) => getImage({ src: t.data.imagen, widths: [800, 1300, 2000], quality: 85 })),
+);
+
+const datosVisor = trabajos.map((t, i) => ({
+  id: t.id,
+  titulo: t.data.titulo,
+  categoria: t.data.categoria,
+  ubicacion: t.data.ubicacion ?? '',
+  anio: t.data.anio,
+  trabajo: t.data.trabajo,
+  descripcion: t.body?.trim() ?? '',
+  src: grandes[i].src,
+  srcset: grandes[i].srcSet.attribute,
+  ancho: t.data.imagen.width,
+  alto: t.data.imagen.height,
+}));
+---
+
+<Layout
+  titulo="Trabajos realizados"
+  descripcion="Galería de trabajos de pintura de Osmundo: casas, fachadas, oficinas y locales comerciales."
+>
+  <div class="contenedor">
+    <header class="encabezado-pagina" data-reveal>
+      <p class="etiqueta">Galería</p>
+      <h1>Trabajos realizados</h1>
+      <p>Algunos de los proyectos de pintura que he realizado en casas y negocios. Toque cualquier foto para verla en grande con sus detalles.</p>
+    </header>
+
+    {
+      categorias.length > 1 && (
+        <div class="filtros" role="group" aria-label="Filtrar por categoría" data-reveal>
+          <button type="button" class="filtro" aria-pressed="true" data-filtro="*">
+            Todas
+          </button>
+          {categorias.map((c) => (
+            <button type="button" class="filtro" aria-pressed="false" data-filtro={c}>
+              {c}
+            </button>
+          ))}
+        </div>
+      )
+    }
+
+    <div class="rejilla" data-rejilla>
+      {
+        trabajos.map((t, i) => (
+          <div class="celda" data-categoria={t.data.categoria} data-id={t.id}>
+            <TrabajoCard trabajo={t} indice={i} carga={i < 3 ? 'eager' : 'lazy'} />
+          </div>
+        ))
+      }
+    </div>
+  </div>
+
+  <dialog class="lightbox" data-lightbox aria-label="Foto ampliada">
+    <div class="lb-cuerpo">
+      <div class="lb-imagen">
+        <img alt="" data-lb-img />
+      </div>
+      <aside class="lb-info">
+        <p class="etiqueta" data-lb-categoria></p>
+        <h2 data-lb-titulo></h2>
+        <dl>
+          <div><dt>Trabajo</dt><dd data-lb-trabajo></dd></div>
+          <div data-lb-fila-ubicacion><dt>Ubicación</dt><dd data-lb-ubicacion></dd></div>
+          <div><dt>Año</dt><dd data-lb-anio></dd></div>
+        </dl>
+        <p class="lb-descripcion" data-lb-descripcion></p>
+        <a class="enlace-flecha" data-lb-consultar href="/contacto/">Quiero algo así <span aria-hidden="true">→</span></a>
+        <p class="lb-contador" data-lb-contador></p>
+      </aside>
+    </div>
+    <button class="lb-boton lb-cerrar" type="button" data-lb-cerrar aria-label="Cerrar">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"></path></svg>
+    </button>
+    <button class="lb-boton lb-anterior" type="button" data-lb-anterior aria-label="Foto anterior">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4l-8 8 8 8"></path></svg>
+    </button>
+    <button class="lb-boton lb-siguiente" type="button" data-lb-siguiente aria-label="Foto siguiente">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4l8 8-8 8"></path></svg>
+    </button>
+  </dialog>
+
+  <script is:inline type="application/json" id="datos-trabajos" set:html={JSON.stringify(datosVisor)} />
+</Layout>
+
+<script>
+  type Trabajo = {
+    id: string;
+    titulo: string;
+    categoria: string;
+    ubicacion: string;
+    anio: number;
+    trabajo: string;
+    descripcion: string;
+    src: string;
+    srcset: string;
+    ancho: number;
+    alto: number;
+  };
+
+  const trabajos: Trabajo[] = JSON.parse(document.getElementById('datos-trabajos')!.textContent || '[]');
+  const porId = new Map(trabajos.map((t) => [t.id, t]));
+  const celdas = [...document.querySelectorAll<HTMLElement>('[data-rejilla] .celda')];
+
+  // ── Filtros ──────────────────────────────────────────────
+  const botonesFiltro = [...document.querySelectorAll<HTMLButtonElement>('[data-filtro]')];
+  let filtroActual = '*';
+
+  function aplicarFiltro(filtro: string) {
+    filtroActual = filtro;
+    botonesFiltro.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filtro === filtro)));
+    celdas.forEach((c) => {
+      const mostrar = filtro === '*' || c.dataset.categoria === filtro;
+      if (mostrar && c.hidden) {
+        c.hidden = false;
+        c.animate([{ opacity: 0, transform: 'translateY(16px)' }, { opacity: 1, transform: 'none' }], {
+          duration: 600,
+          easing: 'cubic-bezier(0.22, 0.61, 0.36, 1)',
+        });
+      } else if (!mostrar) {
+        c.hidden = true;
+      }
+      // Asegura que las fotos ocultas por la animación de scroll se muestren
+      c.querySelector('[data-reveal]')?.classList.add('visible');
+    });
+  }
+  botonesFiltro.forEach((b) => b.addEventListener('click', () => aplicarFiltro(b.dataset.filtro!)));
+
+  // ── Lightbox ─────────────────────────────────────────────
+  const dialogo = document.querySelector<HTMLDialogElement>('[data-lightbox]')!;
+  const $ = <T extends HTMLElement>(sel: string) => dialogo.querySelector<T>(sel)!;
+  const img = $<HTMLImageElement>('[data-lb-img]');
+  let actual = '';
+
+  const visibles = () => celdas.filter((c) => !c.hidden).map((c) => c.dataset.id!);
+
+  function mostrar(id: string) {
+    const o = porId.get(id);
+    if (!o) return;
+    actual = id;
+    img.classList.remove('cargada');
+    img.onload = () => img.classList.add('cargada');
+    img.width = o.ancho;
+    img.height = o.alto;
+    img.sizes = '(max-width: 900px) 100vw, 70vw';
+    img.srcset = o.srcset;
+    img.src = o.src;
+    img.alt = `${o.titulo}: ${o.trabajo}`;
+    if (img.complete) img.classList.add('cargada');
+    $('[data-lb-categoria]').textContent = o.categoria;
+    $('[data-lb-titulo]').textContent = o.titulo;
+    $('[data-lb-trabajo]').textContent = o.trabajo;
+    $('[data-lb-ubicacion]').textContent = o.ubicacion;
+    $('[data-lb-fila-ubicacion]').hidden = !o.ubicacion;
+    $('[data-lb-anio]').textContent = String(o.anio);
+    $('[data-lb-descripcion]').textContent = o.descripcion;
+    $<HTMLAnchorElement>('[data-lb-consultar]').href = `/contacto/?trabajo=${encodeURIComponent(o.titulo)}`;
+    const lista = visibles();
+    $('[data-lb-contador]').textContent = `${lista.indexOf(id) + 1} / ${lista.length}`;
+    history.replaceState(null, '', `#${id}`);
+  }
+
+  function abrir(id: string) {
+    if (!porId.has(id)) return;
+    if (!visibles().includes(id)) aplicarFiltro('*');
+    mostrar(id);
+    if (!dialogo.open) {
+      dialogo.showModal();
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  function mover(paso: number) {
+    const lista = visibles();
+    const i = lista.indexOf(actual);
+    mostrar(lista[(i + paso + lista.length) % lista.length]);
+  }
+
+  dialogo.addEventListener('close', () => {
+    document.body.style.overflow = '';
+    history.replaceState(null, '', location.pathname + location.search);
+    document.querySelector<HTMLElement>(`[data-abrir-trabajo="${CSS.escape(actual)}"]`)?.focus();
+  });
+
+  document.querySelectorAll<HTMLElement>('[data-abrir-trabajo]').forEach((b) =>
+    b.addEventListener('click', () => abrir(b.dataset.abrirTrabajo!)),
+  );
+  $('[data-lb-cerrar]').addEventListener('click', () => dialogo.close());
+  $('[data-lb-anterior]').addEventListener('click', () => mover(-1));
+  $('[data-lb-siguiente]').addEventListener('click', () => mover(1));
+
+  // Cerrar al hacer clic fuera de la imagen y del texto
+  dialogo.addEventListener('click', (e) => {
+    const t = e.target as HTMLElement;
+    if (t === dialogo || t.classList.contains('lb-cuerpo') || t.classList.contains('lb-imagen')) dialogo.close();
+  });
+
+  dialogo.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') mover(1);
+    if (e.key === 'ArrowLeft') mover(-1);
+  });
+
+  // Deslizar con el dedo en el celular
+  let inicioX = 0;
+  dialogo.addEventListener('touchstart', (e) => (inicioX = e.touches[0].clientX), { passive: true });
+  dialogo.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - inicioX;
+    if (Math.abs(dx) > 50) mover(dx < 0 ? 1 : -1);
+  });
+
+  // Abrir directamente si la URL trae #id-del-trabajo (enlaces desde el inicio)
+  const desdeHash = decodeURIComponent(location.hash.slice(1));
+  if (desdeHash) abrir(desdeHash);
+</script>
+
+<style>
+  .filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.75rem;
+    margin-bottom: clamp(2.5rem, 5vw, 4rem);
+    border-bottom: 1px solid var(--linea);
+  }
+  .filtro {
+    position: relative;
+    padding: 0.75rem 0;
+    background: none;
+    border: 0;
+    font-family: var(--sans);
+    font-size: 0.8125rem;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--tinta-suave);
+    cursor: pointer;
+    transition: color 0.3s;
+  }
+  .filtro::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 2px;
+    background: var(--acento);
+    transform: scaleX(0);
+    transition: transform 0.45s var(--ease);
+  }
+  .filtro:hover,
+  .filtro[aria-pressed='true'] {
+    color: var(--tinta);
+  }
+  .filtro[aria-pressed='true']::after {
+    transform: scaleX(1);
+  }
+
+  .rejilla {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(2rem, 4vw, 3.5rem) clamp(1.25rem, 3vw, 2.5rem);
+  }
+  @media (max-width: 900px) {
+    .rejilla {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 560px) {
+    .rejilla {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* ── Lightbox ── */
+  .lightbox {
+    width: 100vw;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: rgba(28, 25, 22, 0.97);
+    color: var(--papel);
+  }
+  .lightbox[open] {
+    animation: lb-entrar 0.45s var(--ease);
+  }
+  .lightbox::backdrop {
+    background: transparent;
+  }
+  @keyframes lb-entrar {
+    from {
+      opacity: 0;
+    }
+  }
+  .lb-cuerpo {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 22rem;
+    height: 100%;
+  }
+  .lb-imagen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(1rem, 4vw, 4rem) clamp(4rem, 6vw, 6rem);
+    min-height: 0;
+  }
+  .lb-imagen img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    box-shadow: 0 30px 70px -20px rgba(0, 0, 0, 0.7);
+    opacity: 0;
+    transform: scale(0.985);
+    transition:
+      opacity 0.5s var(--ease),
+      transform 0.6s var(--ease);
+  }
+  .lb-imagen img.cargada {
+    opacity: 1;
+    transform: none;
+  }
+  .lb-info {
+    align-self: center;
+    padding: 2rem 2.5rem 2rem 0;
+    overflow-y: auto;
+    max-height: 100%;
+  }
+  .lb-info .etiqueta {
+    color: #d98b6c;
+  }
+  .lb-info h2 {
+    font-size: clamp(2rem, 3vw, 2.75rem);
+    color: var(--papel);
+  }
+  dl {
+    margin: 1.75rem 0;
+    border-top: 1px solid rgba(251, 249, 245, 0.15);
+  }
+  dl div {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid rgba(251, 249, 245, 0.15);
+    font-size: 0.9375rem;
+  }
+  dl div[hidden] {
+    display: none;
+  }
+  dt {
+    flex: none;
+    color: rgba(251, 249, 245, 0.55);
+    font-size: 0.75rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    padding-top: 0.2rem;
+  }
+  dd {
+    margin: 0;
+    text-align: right;
+  }
+  .lb-descripcion {
+    font-family: var(--serif);
+    font-size: 1.2rem;
+    font-style: italic;
+    line-height: 1.5;
+    color: rgba(251, 249, 245, 0.8);
+  }
+  .lb-descripcion:empty {
+    display: none;
+  }
+  .lb-info .enlace-flecha {
+    color: var(--papel);
+  }
+  .lb-info .enlace-flecha:hover {
+    color: #e3a184;
+  }
+  .lb-contador {
+    margin: 2rem 0 0;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    color: rgba(251, 249, 245, 0.45);
+  }
+
+  .lb-boton {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    background: rgba(251, 249, 245, 0.06);
+    border: 1px solid rgba(251, 249, 245, 0.15);
+    border-radius: 50%;
+    color: var(--papel);
+    cursor: pointer;
+    transition:
+      background 0.3s,
+      border-color 0.3s,
+      transform 0.3s var(--ease);
+  }
+  .lb-boton:hover {
+    background: var(--acento);
+    border-color: var(--acento);
+  }
+  .lb-boton svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+  }
+  .lb-cerrar {
+    top: 1.25rem;
+    right: 1.25rem;
+  }
+  .lb-cerrar:hover {
+    transform: rotate(90deg);
+  }
+  .lb-anterior,
+  .lb-siguiente {
+    top: 50%;
+    translate: 0 -50%;
+  }
+  .lb-anterior {
+    left: 1.25rem;
+  }
+  .lb-siguiente {
+    right: calc(22rem + 0.5rem);
+  }
+
+  @media (max-width: 900px) {
+    .lb-cuerpo {
+      grid-template-columns: 1fr;
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+    .lb-imagen {
+      padding: 4.5rem 1rem 1rem;
+    }
+    .lb-info {
+      align-self: end;
+      padding: 0.5rem 1.5rem 1.75rem;
+      max-height: 42dvh;
+    }
+    .lb-info h2 {
+      font-size: 1.75rem;
+      margin-bottom: 0.25rem;
+    }
+    dl {
+      margin: 0.75rem 0 1rem;
+    }
+    dl div {
+      padding: 0.5rem 0;
+    }
+    .lb-descripcion {
+      font-size: 1.05rem;
+    }
+    .lb-contador {
+      margin-top: 1rem;
+    }
+    .lb-anterior,
+    .lb-siguiente {
+      top: 1.25rem;
+      translate: none;
+    }
+    .lb-anterior {
+      left: 1.25rem;
+    }
+    .lb-siguiente {
+      left: 4.75rem;
+      right: auto;
+    }
+  }
+</style>

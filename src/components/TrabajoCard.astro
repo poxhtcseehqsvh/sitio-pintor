@@ -1,0 +1,101 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  trabajo: CollectionEntry<'trabajos'>;
+  /** Si se indica, la tarjeta es un enlace; si no, un botón (abre el visor de la galería) */
+  href?: string;
+  indice?: number;
+  carga?: 'eager' | 'lazy';
+}
+
+const { trabajo, href, indice = 0, carga = 'lazy' } = Astro.props;
+const { titulo, imagen, categoria, ubicacion } = trabajo.data;
+const Etiqueta = href ? 'a' : 'button';
+---
+
+<figure class="trabajo" data-reveal style={`--retraso:${(indice % 3) * 0.12}s`}>
+  <Etiqueta
+    class="foto"
+    href={href}
+    type={href ? undefined : 'button'}
+    data-abrir-trabajo={href ? undefined : trabajo.id}
+    aria-label={`Ver «${titulo}» en grande`}
+  >
+    <Image
+      src={imagen}
+      alt={`${titulo}: ${trabajo.data.trabajo}`}
+      widths={[400, 700, 1000]}
+      sizes="(max-width: 560px) 92vw, (max-width: 900px) 45vw, 380px"
+      loading={carga}
+      quality={80}
+    />
+    <span class="categoria">{categoria}</span>
+  </Etiqueta>
+  <figcaption>
+    <h3>{titulo}</h3>
+    {ubicacion && <p>{ubicacion}</p>}
+  </figcaption>
+</figure>
+
+<style>
+  .trabajo {
+    margin: 0;
+  }
+  .foto {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    padding: 0;
+    border: 0;
+    background: var(--hueso);
+    cursor: zoom-in;
+    overflow: hidden;
+  }
+  a.foto {
+    cursor: pointer;
+  }
+  .foto :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition:
+      transform 1s var(--ease),
+      filter 0.6s var(--ease);
+  }
+  .foto:hover :global(img),
+  .foto:focus-visible :global(img) {
+    transform: scale(1.05);
+    filter: brightness(0.92);
+  }
+  .categoria {
+    position: absolute;
+    left: 1rem;
+    bottom: 1rem;
+    padding: 0.35rem 0.75rem;
+    background: color-mix(in srgb, var(--papel) 92%, transparent);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--tinta);
+  }
+  figcaption {
+    padding-top: 1rem;
+  }
+  h3 {
+    font-size: 1.4rem;
+    margin: 0 0 0.1rem;
+    transition: color 0.3s;
+  }
+  .trabajo:hover h3 {
+    color: var(--acento);
+  }
+  figcaption p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--tinta-suave);
+  }
+</style>

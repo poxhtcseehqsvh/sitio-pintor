@@ -1,0 +1,23 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout titulo="Página no encontrada" descripcion="La página que busca no existe.">
+  <section class="contenedor no-encontrada">
+    <p class="etiqueta">Error 404</p>
+    <h1>Esta pared aún no está pintada</h1>
+    <p>La página que busca no existe o cambió de lugar.</p>
+    <a class="boton" href="/">Volver al inicio</a>
+  </section>
+</Layout>
+
+<style>
+  .no-encontrada {
+    text-align: center;
+    padding-block: clamp(5rem, 15vw, 10rem);
+  }
+  .no-encontrada p:not(.etiqueta) {
+    color: var(--tinta-suave);
+    margin-bottom: 2rem;
+  }
+</style>

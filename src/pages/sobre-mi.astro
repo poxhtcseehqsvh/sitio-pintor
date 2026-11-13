@@ -1,0 +1,202 @@
+---
+import { Image } from 'astro:assets';
+import Layout from '../layouts/Layout.astro';
+import { SITIO } from '../config';
+import fotoPintor from '../assets/pintor.jpg'; // ← reemplaza este archivo por una foto real
+
+// ✏️ TEXTO DE EJEMPLO: reemplázalo por la información real
+const trayectoria = [
+  { anio: '2024', texto: 'Mantenimiento de pintura para oficinas y locales de la zona.' },
+  { anio: '2020', texto: 'Comienza a trabajar fachadas de edificios de varios niveles.' },
+  { anio: '2014', texto: 'Se independiza y forma su propio equipo de trabajo.' },
+  { anio: '2005', texto: 'Primeros trabajos como oficial pintor en obras residenciales.' },
+];
+
+const compromisos = [
+  'Visita y cotización sin costo',
+  'Protección de muebles, pisos y ventanas',
+  'Materiales de buena calidad',
+  'Puntualidad y respeto por su espacio',
+  'Limpieza total al terminar',
+  'Garantía en el trabajo realizado',
+];
+---
+
+<Layout
+  titulo="Sobre mí"
+  descripcion={`Conozca a ${SITIO.nombre}, pintor profesional con ${SITIO.experiencia} años de experiencia en pintura residencial y comercial.`}
+  imagen={fotoPintor}
+>
+  <div class="contenedor">
+    <header class="encabezado-pagina" data-reveal>
+      <p class="etiqueta">Sobre mí</p>
+      <h1>Hola, soy {SITIO.nombre}</h1>
+    </header>
+
+    <section class="bio">
+      <figure class="bio-foto" data-reveal>
+        <Image
+          src={fotoPintor}
+          alt={`${SITIO.nombre}, pintor profesional`}
+          widths={[400, 700, 1000]}
+          sizes="(max-width: 860px) 92vw, 40vw"
+          loading="eager"
+          quality={82}
+        />
+      </figure>
+
+      <div class="bio-texto" data-reveal style="--retraso:0.15s">
+        <p class="entrada">
+          Llevo más de {SITIO.experiencia} años pintando casas, departamentos y negocios. Para mí, un buen trabajo se nota
+          en los detalles: líneas limpias, colores parejos y un cliente tranquilo.
+        </p>
+        <p>
+          Aprendí el oficio trabajando en obra, al lado de maestros pintores que me enseñaron que la preparación es la
+          mitad del resultado: resanar bien, lijar, sellar y entonces sí, pintar.
+        </p>
+        <p>
+          Con los años formé mi propio equipo y hoy atiendo desde un cuarto hasta fachadas completas, oficinas y locales
+          comerciales. Le ayudo también a elegir colores y el tipo de pintura adecuado para cada espacio.
+        </p>
+        <p class="nota-ejemplo">(Texto de ejemplo: se reemplazará por la historia real.)</p>
+
+        <h2 class="subtitulo">Mi compromiso</h2>
+        <ul class="compromisos">
+          {compromisos.map((c) => <li>{c}</li>)}
+        </ul>
+      </div>
+    </section>
+
+    <section class="seccion trayectoria">
+      <div data-reveal>
+        <p class="etiqueta">Trayectoria</p>
+        <h2>Años de oficio</h2>
+      </div>
+      <ol>
+        {
+          trayectoria.map((t, i) => (
+            <li data-reveal style={`--retraso:${i * 0.08}s`}>
+              <span class="anio">{t.anio}</span>
+              <span>{t.texto}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section class="cierre" data-reveal>
+      <a class="boton boton--acento" href="/contacto/">Pedir cotización</a>
+      <a class="enlace-flecha" href="/galeria/">Ver trabajos <span aria-hidden="true">→</span></a>
+    </section>
+  </div>
+</Layout>
+
+<style>
+  .bio {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: clamp(2rem, 6vw, 6rem);
+    align-items: start;
+  }
+  .bio-foto {
+    margin: 0;
+    position: sticky;
+    top: 7rem;
+  }
+  .bio-foto :global(img) {
+    width: 100%;
+    box-shadow: 0 30px 60px -30px rgba(38, 34, 30, 0.45);
+  }
+  .entrada {
+    font-family: var(--serif);
+    font-size: clamp(1.5rem, 2.4vw, 1.9rem);
+    line-height: 1.4;
+    margin-bottom: 1.5em;
+  }
+  .bio-texto p:not(.entrada) {
+    color: var(--tinta-suave);
+  }
+  .nota-ejemplo {
+    font-size: 0.8125rem;
+    font-style: italic;
+  }
+  .subtitulo {
+    font-size: 1.9rem;
+    margin-top: 2.5rem;
+  }
+  .compromisos {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem 1.5rem;
+  }
+  .compromisos li {
+    position: relative;
+    padding-left: 1.6rem;
+  }
+  .compromisos li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 0.8rem;
+    height: 0.45rem;
+    border-left: 1.5px solid var(--acento);
+    border-bottom: 1.5px solid var(--acento);
+    transform: rotate(-45deg);
+  }
+
+  .trayectoria {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: clamp(2rem, 6vw, 6rem);
+  }
+  ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--linea);
+  }
+  ol li {
+    display: grid;
+    grid-template-columns: 5rem 1fr;
+    gap: 1.5rem;
+    padding: 1.4rem 0;
+    border-bottom: 1px solid var(--linea);
+  }
+  .anio {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    line-height: 1.2;
+    color: var(--acento);
+  }
+  .cierre {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem 2rem;
+  }
+
+  @media (max-width: 860px) {
+    .bio,
+    .trayectoria {
+      grid-template-columns: 1fr;
+    }
+    .bio-foto {
+      position: static;
+      max-width: 30rem;
+    }
+    ol li {
+      grid-template-columns: 4rem 1fr;
+      gap: 1rem;
+    }
+  }
+  @media (max-width: 480px) {
+    .compromisos {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
