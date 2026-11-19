@@ -1,0 +1,99 @@
+---
+import Logo from '../assets/logo.svg';
+import Icon from './Icon.astro';
+import { SITE } from '../config';
+import { DICT, LANGS, PATHS, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = DICT[lang];
+---
+
+<div class="topbar">
+  <div class="container topbar__inner">
+    <span>{t.topbar.license}{SITE.license}</span>
+    <span class="topbar__dot" aria-hidden="true"></span>
+    <span>{t.topbar.area}</span>
+    <span class="topbar__spacer"></span>
+    <a href={`mailto:${SITE.email}`}><Icon name="mail" />{SITE.email}</a>
+    <a href={SITE.phoneHref}><Icon name="phone" />{SITE.phoneDisplay}</a>
+  </div>
+</div>
+
+<header class="header" data-header>
+  <div class="container header__inner">
+    <a class="header__logo" href={PATHS[lang]} aria-label={SITE.name}>
+      <Logo width="210" height="56" aria-hidden="true" />
+    </a>
+
+    <nav class="nav" id="site-nav" aria-label="Main">
+      <a href="#services">{t.nav.services}</a>
+      <a href="#why">{t.nav.why}</a>
+      <a href="#gallery">{t.nav.gallery}</a>
+      <a href="#contact">{t.nav.contact}</a>
+      <a class="btn btn--red btn--sm nav__cta" href="#contact">{t.nav.quote}</a>
+    </nav>
+
+    <div class="header__actions">
+      <div class="lang-toggle" role="group" aria-label={t.nav.langLabel}>
+        {
+          LANGS.map((l) => (
+            <a
+              href={PATHS[l]}
+              hreflang={l}
+              lang={l}
+              data-set-lang={l}
+              aria-current={l === lang ? 'true' : undefined}
+              title={l === 'en' ? 'English' : 'Español'}
+            >
+              {l.toUpperCase()}
+            </a>
+          ))
+        }
+      </div>
+      <a class="header__call" href={SITE.phoneHref} aria-label={`${t.contact.callUs} ${SITE.phoneDisplay}`}>
+        <Icon name="phone" />
+      </a>
+      <button class="menu-btn" type="button" aria-controls="site-nav" aria-expanded="false" data-menu-btn>
+        <span class="sr-only">{t.nav.menu}</span>
+        <span class="menu-btn__bars" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<script>
+  import { LANG_STORAGE_KEY } from '../i18n';
+
+  // Language buttons (header + footer): save the choice in localStorage,
+  // then open the other language keeping the current #section.
+  document.querySelectorAll<HTMLAnchorElement>('[data-set-lang]').forEach((a) => {
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      try {
+        localStorage.setItem(LANG_STORAGE_KEY, a.dataset.setLang!);
+      } catch {}
+      if (a.getAttribute('aria-current') !== 'true') location.href = a.href + location.hash;
+    });
+  });
+
+  // Mobile menu
+  const btn = document.querySelector<HTMLButtonElement>('[data-menu-btn]');
+  const nav = document.getElementById('site-nav');
+  const setOpen = (open: boolean) => {
+    btn?.setAttribute('aria-expanded', String(open));
+    nav?.classList.toggle('is-open', open);
+    document.body.classList.toggle('menu-open', open);
+  };
+  btn?.addEventListener('click', () => setOpen(btn.getAttribute('aria-expanded') !== 'true'));
+  nav?.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+  document.addEventListener('keydown', (e) => e.key === 'Escape' && setOpen(false));
+
+  // Header shadow on scroll
+  const header = document.querySelector('[data-header]');
+  const onScroll = () => header?.classList.toggle('is-scrolled', window.scrollY > 8);
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+</script>

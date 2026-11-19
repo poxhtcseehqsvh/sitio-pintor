@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 372 100" role="img">
+  <title>Rizzo Ditalia Painting Corporation</title>
+  <!-- Hexagon mark: red outer frame, green inner frame, geometric cube lines -->
+  <g fill="none" stroke-linejoin="round" stroke-linecap="round">
+    <polygon points="50,6 88.1,28 88.1,72 50,94 11.9,72 11.9,28" stroke="#cc0000" stroke-width="6"/>
+    <polygon points="50,22 74.2,36 74.2,64 50,78 25.8,64 25.8,36" stroke="#006400" stroke-width="4.5"/>
+    <path d="M50 50 L50 78 M50 50 L25.8 36 M50 50 L74.2 36" stroke="#cc0000" stroke-width="4.5"/>
+    <path d="M50 6 L50 22 M88.1 72 L74.2 64 M11.9 72 L25.8 64" stroke="#006400" stroke-width="3"/>
+  </g>
+  <!-- Wordmark -->
+  <text class="logo-name" x="106" y="54" fill="#1a2b5e" font-family="Montserrat, 'Segoe UI', Arial, sans-serif" font-size="38" font-weight="800" letter-spacing="-0.5">Rizzo Ditalia</text>
+  <text class="logo-sub" x="108" y="79" fill="#1a2b5e" font-family="Montserrat, 'Segoe UI', Arial, sans-serif" font-size="15.5" font-weight="600" letter-spacing="3.1">PAINTING CORPORATION</text>
+</svg>

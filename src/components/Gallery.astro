@@ -1,0 +1,30 @@
+---
+import { GALLERY } from '../config';
+import { DICT, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const t = DICT[Astro.props.lang].gallery;
+---
+
+<section class="section" id="gallery">
+  <div class="container">
+    <header class="section__head">
+      <p class="eyebrow">{t.eyebrow}</p>
+      <h2>{t.title}</h2>
+      <p class="gallery__note">{t.note}</p>
+    </header>
+
+    <div class="gallery">
+      {
+        GALLERY.map((img) => (
+          <figure class="gallery__item">
+            <img src={img.src} alt={t.items[img.key]} width="800" height="600" loading="lazy" decoding="async" />
+            <figcaption>{t.items[img.key]}</figcaption>
+          </figure>
+        ))
+      }
+    </div>
+  </div>
+</section>

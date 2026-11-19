@@ -1,0 +1,74 @@
+---
+import Icon from './Icon.astro';
+import { SITE, whatsappUrl } from '../config';
+import { DICT, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = DICT[lang];
+---
+
+<section class="hero">
+  <svg class="hero__pattern" viewBox="0 0 600 600" aria-hidden="true" focusable="false">
+    <g fill="none" stroke-linejoin="round">
+      <polygon points="300,20 542,160 542,440 300,580 58,440 58,160" stroke="#cc0000" stroke-width="10" opacity=".55" />
+      <polygon points="300,110 464,205 464,395 300,490 136,395 136,205" stroke="#2f9e44" stroke-width="8" opacity=".45" />
+      <path d="M300 300 L300 490 M300 300 L136 205 M300 300 L464 205" stroke="#cc0000" stroke-width="8" opacity=".45" />
+      <polygon points="300,200 387,250 387,350 300,400 213,350 213,250" stroke="#fff" stroke-width="3" opacity=".12" />
+    </g>
+  </svg>
+
+  <div class="container hero__inner">
+    <div class="hero__copy">
+      <p class="eyebrow eyebrow--light">{t.hero.eyebrow}</p>
+      <h1>
+        {t.hero.titleA}
+        <span>{t.hero.titleB}</span>
+      </h1>
+      <p class="hero__subtitle">{t.hero.subtitle}</p>
+
+      <a class="hero__phone" href={SITE.phoneHref}>
+        <span class="hero__phone-icon"><Icon name="phone" /></span>
+        <span>
+          <small>{t.hero.callLabel}</small>
+          <strong>{SITE.phoneDisplay}</strong>
+        </span>
+      </a>
+
+      <div class="hero__ctas">
+        <a class="btn btn--red btn--lg" href="#contact">
+          {t.hero.cta}
+          <Icon name="arrow" />
+        </a>
+        <a class="btn btn--ghost btn--lg" href={whatsappUrl(t.whatsappMessage)} target="_blank" rel="noopener">
+          <Icon name="whatsapp" />
+          {t.hero.whatsapp}
+        </a>
+      </div>
+    </div>
+
+    <aside class="hero__card">
+      <h2>{t.hero.cardTitle}</h2>
+      <ul>
+        {
+          t.hero.cardItems.map((item) => (
+            <li>
+              <Icon name="check" />
+              {item}
+            </li>
+          ))
+        }
+      </ul>
+      <div class="hero__badge">
+        <Icon name="license" />
+        <span>
+          <small>{t.hero.cardLicense}</small>
+          <strong>#{SITE.license}</strong>
+        </span>
+      </div>
+    </aside>
+  </div>
+  <div class="tricolor" aria-hidden="true"><span></span><span></span><span></span></div>
+</section>

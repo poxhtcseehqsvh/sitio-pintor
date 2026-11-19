@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import Logo from '../assets/logo.svg';
 import { DICT } from '../i18n';
 const en = DICT.en.notFound;
 const es = DICT.es.notFound;
@@ -8,9 +9,9 @@ const es = DICT.es.notFound;
 <Layout lang="en" title="404 | Rizzo Ditalia Painting" description={en.text} noindex>
   <div class="tricolor" aria-hidden="true"><span></span><span></span><span></span></div>
   <main class="not-found container">
-    <img src="/logo-mark.svg" alt="" width="72" height="72" />
-    <h1>404</h1>
-    <h2>{en.title}</h2>
+    <a href="/" aria-label="Rizzo Ditalia Painting Corporation"><Logo width="260" height="70" aria-hidden="true" /></a>
+    <p class="not-found__code">404</p>
+    <h1>{en.title}</h1>
     <p>{en.text}</p>
     <a class="btn btn--red" href="/">{en.back}</a>
     <hr />

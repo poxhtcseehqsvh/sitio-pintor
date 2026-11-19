@@ -1,0 +1,26 @@
+---
+import Icon from './Icon.astro';
+import { SITE } from '../config';
+import { DICT, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const t = DICT[Astro.props.lang];
+---
+
+<section class="band">
+  <div class="container band__inner">
+    <div>
+      <h2>{t.band.title}</h2>
+      <p>{t.band.text}</p>
+    </div>
+    <div class="band__actions">
+      <a class="band__phone" href={SITE.phoneHref}>
+        <Icon name="phone" />
+        {SITE.phoneDisplay}
+      </a>
+      <a class="btn btn--white btn--lg" href="#contact">{t.hero.cta}</a>
+    </div>
+  </div>
+</section>

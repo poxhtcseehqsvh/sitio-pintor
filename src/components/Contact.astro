@@ -1,0 +1,151 @@
+---
+import Icon from './Icon.astro';
+import { SITE, WEB3FORMS_ACCESS_KEY, whatsappUrl } from '../config';
+import { DICT, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const t = DICT[Astro.props.lang];
+const c = t.contact;
+---
+
+<section class="section section--soft" id="contact">
+  <div class="container contact">
+    <div class="contact__info">
+      <p class="eyebrow eyebrow--light">{c.eyebrow}</p>
+      <h2>{c.title}</h2>
+      <p>{c.text}</p>
+
+      <ul class="contact__list">
+        <li>
+          <Icon name="phone" />
+          <div>
+            <small>{c.callUs}</small>
+            <a href={SITE.phoneHref}>{SITE.phoneDisplay}</a>
+          </div>
+        </li>
+        <li>
+          <Icon name="mail" />
+          <div>
+            <small>{c.emailUs}</small>
+            <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+          </div>
+        </li>
+        <li>
+          <Icon name="whatsapp" />
+          <div>
+            <small>{c.whatsapp}</small>
+            <a href={whatsappUrl(t.whatsappMessage)} target="_blank" rel="noopener">{SITE.phoneDisplay}</a>
+          </div>
+        </li>
+        <li>
+          <Icon name="pin" />
+          <div>
+            <small>{c.area}</small>
+            <span>{c.areaValue}</span>
+          </div>
+        </li>
+        <li>
+          <Icon name="license" />
+          <div>
+            <small>{c.license}</small>
+            <span>#{SITE.license}</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <form
+      class="form"
+      action="https://api.web3forms.com/submit"
+      method="POST"
+      data-contact-form
+      data-key={WEB3FORMS_ACCESS_KEY}
+      data-msg-sending={c.sending}
+      data-msg-success={c.success}
+      data-msg-error={c.error}
+      data-msg-config={c.notConfigured}
+    >
+      {/* Web3Forms access key comes from src/config.ts → WEB3FORMS_ACCESS_KEY */}
+      <input type="hidden" name="access_key" value={WEB3FORMS_ACCESS_KEY} />
+      <input type="hidden" name="subject" value={c.subject} />
+      <input type="hidden" name="from_name" value={SITE.name} />
+      <input type="checkbox" name="botcheck" class="sr-only" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+      <div class="form__row">
+        <label>
+          <span>{c.name} *</span>
+          <input type="text" name="name" required autocomplete="name" />
+        </label>
+        <label>
+          <span>{c.phone} *</span>
+          <input type="tel" name="phone" required autocomplete="tel" inputmode="tel" />
+        </label>
+      </div>
+      <div class="form__row">
+        <label>
+          <span>{c.email}</span>
+          <input type="email" name="email" autocomplete="email" />
+        </label>
+        <label>
+          <span>{c.service}</span>
+          <select name="service">
+            <option value="">{c.servicePlaceholder}</option>
+            {t.services.items.map((s) => <option value={s.title}>{s.title}</option>)}
+            <option value={c.serviceOther}>{c.serviceOther}</option>
+          </select>
+        </label>
+      </div>
+      <label>
+        <span>{c.message}</span>
+        <textarea name="message" rows="5" placeholder={c.messagePlaceholder}></textarea>
+      </label>
+
+      <button class="btn btn--red btn--lg btn--block" type="submit">
+        {c.submit}
+        <Icon name="arrow" />
+      </button>
+      <p class="form__status" role="status" aria-live="polite" data-form-status></p>
+    </form>
+  </div>
+</section>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
+  const status = form?.querySelector<HTMLElement>('[data-form-status]');
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!form || !status) return;
+    const d = form.dataset;
+    const button = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    const show = (msg: string, kind: 'ok' | 'err' | '') => {
+      status.textContent = msg;
+      status.className = `form__status ${kind ? `form__status--${kind}` : ''}`;
+    };
+
+    if (!d.key || d.key.startsWith('PASTE_')) {
+      show(d.msgConfig!, 'err');
+      return;
+    }
+
+    button.disabled = true;
+    show(d.msgSending!, '');
+    try {
+      const res = await fetch(form.action, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(Object.fromEntries(new FormData(form))),
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.message);
+      form.reset();
+      show(d.msgSuccess!, 'ok');
+    } catch {
+      show(d.msgError!, 'err');
+    } finally {
+      button.disabled = false;
+    }
+  });
+</script>

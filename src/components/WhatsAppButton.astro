@@ -1,0 +1,15 @@
+---
+import Icon from './Icon.astro';
+import { whatsappUrl } from '../config';
+import { DICT, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const t = DICT[Astro.props.lang];
+---
+
+<!-- Floating WhatsApp button — visible on mobile only (see .wa-float in global.css) -->
+<a class="wa-float" href={whatsappUrl(t.whatsappMessage)} target="_blank" rel="noopener" aria-label={t.whatsappLabel}>
+  <Icon name="whatsapp" />
+</a>

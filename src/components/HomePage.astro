@@ -1,0 +1,29 @@
+---
+import Header from './Header.astro';
+import Hero from './Hero.astro';
+import Services from './Services.astro';
+import WhyUs from './WhyUs.astro';
+import Gallery from './Gallery.astro';
+import CallBand from './CallBand.astro';
+import Contact from './Contact.astro';
+import Footer from './Footer.astro';
+import WhatsAppButton from './WhatsAppButton.astro';
+import type { Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+---
+
+<Header lang={lang} />
+<main>
+  <Hero lang={lang} />
+  <Services lang={lang} />
+  <WhyUs lang={lang} />
+  <Gallery lang={lang} />
+  <CallBand lang={lang} />
+  <Contact lang={lang} />
+</main>
+<Footer lang={lang} />
+<WhatsAppButton lang={lang} />

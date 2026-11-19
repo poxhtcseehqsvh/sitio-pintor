@@ -1,0 +1,60 @@
+---
+import Logo from '../assets/logo.svg';
+import Icon from './Icon.astro';
+import { SITE } from '../config';
+import { DICT, LANGS, PATHS, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = DICT[lang];
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="tricolor" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="container footer__grid">
+    <div class="footer__brand">
+      <a href={PATHS[lang]} aria-label={SITE.name}>
+        <Logo width="230" height="62" aria-hidden="true" />
+      </a>
+      <p>{t.footer.tagline}</p>
+      <p class="footer__license">{t.footer.license}{SITE.license}</p>
+    </div>
+
+    <nav aria-label={t.footer.explore}>
+      <h3>{t.footer.explore}</h3>
+      <ul>
+        <li><a href="#services">{t.nav.services}</a></li>
+        <li><a href="#why">{t.nav.why}</a></li>
+        <li><a href="#gallery">{t.nav.gallery}</a></li>
+        <li><a href="#contact">{t.nav.contact}</a></li>
+      </ul>
+    </nav>
+
+    <div>
+      <h3>{t.footer.contact}</h3>
+      <ul class="footer__contact">
+        <li><a href={SITE.phoneHref}><Icon name="phone" />{SITE.phoneDisplay}</a></li>
+        <li><a href={`mailto:${SITE.email}`}><Icon name="mail" />{SITE.email}</a></li>
+        <li><span><Icon name="pin" />{t.contact.areaValue}</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer__bottom">
+    <div class="container footer__bottom-inner">
+      <p>© {year} {SITE.name}. {t.footer.rights}</p>
+      <p class="footer__langs">
+        {
+          LANGS.map((l) => (
+            <a href={PATHS[l]} hreflang={l} lang={l} data-set-lang={l} aria-current={l === lang ? 'true' : undefined}>
+              {l === 'en' ? 'English' : 'Español'}
+            </a>
+          ))
+        }
+      </p>
+    </div>
+  </div>
+</footer>

@@ -1,7 +1,7 @@
 ---
 import '../styles/global.css';
 import { SITE } from '../config';
-import { DICT, PATHS, type Lang } from '../i18n';
+import { DICT, PATHS, LANG_STORAGE_KEY, type Lang } from '../i18n';
 
 interface Props {
   lang: Lang;
@@ -21,25 +21,37 @@ const altEn = new URL(PATHS.en, site).href;
 const altEs = new URL(PATHS.es, site).href;
 const ogImage = new URL('/og-image.svg', site).href;
 
+// Structured data for Google (local business)
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'HousePainter',
   name: SITE.name,
   url: canonical,
-  telephone: '+1-786-797-4177',
+  telephone: SITE.phoneSchema,
   email: SITE.email,
   image: ogImage,
+  logo: new URL('/favicon.svg', site).href,
   description,
-  priceRange: '$$',
   address: {
     '@type': 'PostalAddress',
     addressLocality: SITE.city,
     addressRegion: SITE.region,
     addressCountry: 'US',
   },
-  areaServed: { '@type': 'City', name: 'Miami' },
+  areaServed: [
+    { '@type': 'City', name: 'Miami' },
+    { '@type': 'AdministrativeArea', name: 'Miami-Dade County' },
+  ],
   knowsLanguage: ['en', 'es'],
-  identifier: { '@type': 'PropertyValue', name: 'License', value: SITE.license },
+  hasCredential: {
+    '@type': 'EducationalOccupationalCredential',
+    credentialCategory: 'license',
+    name: `License ${SITE.license}`,
+  },
+  makesOffer: t.services.items.map((s) => ({
+    '@type': 'Offer',
+    itemOffered: { '@type': 'Service', name: `${s.title} painting` },
+  })),
 };
 ---
 
@@ -50,8 +62,10 @@ const jsonLd = {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="keywords" content={t.seo.keywords} />
     {noindex && <meta name="robots" content="noindex" />}
     <meta name="theme-color" content="#1a2b5e" />
+    <meta name="format-detection" content="telephone=yes" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
     {
@@ -78,22 +92,19 @@ const jsonLd = {
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Open+Sans:wght@400;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Inter:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
 
     {!noindex && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
 
-    {/* Language preference: honor the saved choice (localStorage) before the page paints */}
-    <script is:inline define:vars={{ lang, paths: PATHS, noindex }}>
+    {/* Language preference: if the visitor saved a language (localStorage), go there before painting */}
+    <script is:inline define:vars={{ lang, paths: PATHS, noindex, key: LANG_STORAGE_KEY }}>
       if (!noindex) {
         try {
-          var saved = localStorage.getItem('rdp-lang');
-          var wanted = saved;
-          if (!saved && lang === 'en' && /^es\b/i.test(navigator.language || '')) wanted = 'es';
-          if (wanted && wanted !== lang && paths[wanted]) {
-            location.replace(paths[wanted] + location.hash);
-          }
+          var saved = localStorage.getItem(key);
+          if (!saved && lang === 'en' && /^es\b/i.test(navigator.language || '')) saved = 'es';
+          if (saved && saved !== lang && paths[saved]) location.replace(paths[saved] + location.hash);
         } catch (e) {}
       }
     </script>

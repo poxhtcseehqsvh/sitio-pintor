@@ -9,32 +9,36 @@ export const SITE = {
   shortName: 'Rizzo Ditalia Painting',
   phoneDisplay: '(786) 797-4177',
   phoneHref: 'tel:+17867974177',
+  phoneSchema: '+1-786-797-4177',
   email: 'rizzoditalipainting@gmail.com',
   license: '17BS00076',
   city: 'Miami',
   region: 'FL',
-  // WhatsApp: country code + number, digits only
+  // WhatsApp: country code + number, digits only / código de país + número, solo dígitos
   whatsapp: '17867974177',
 };
 
 /**
- * ⚠️⚠️⚠️  WEB3FORMS ACCESS KEY  ⚠️⚠️⚠️
- * 1. Go to https://web3forms.com and enter the company email
+ * ╔══════════════════════════════════════════════════════════════╗
+ * ║  ⚠️  WEB3FORMS ACCESS KEY — REQUIRED FOR THE CONTACT FORM  ⚠️  ║
+ * ╚══════════════════════════════════════════════════════════════╝
+ * 1. Go to https://web3forms.com and enter: rizzoditalipainting@gmail.com
  * 2. Copy the access key you receive by email
- * 3. Paste it below, replacing the placeholder text
+ * 3. Paste it below, replacing PASTE_YOUR_WEB3FORMS_ACCESS_KEY_HERE
  *
- * 1. Entra a https://web3forms.com y escribe el correo de la empresa
+ * 1. Entra a https://web3forms.com y escribe: rizzoditalipainting@gmail.com
  * 2. Copia la access key que te llega por correo
- * 3. Pégala abajo, reemplazando el texto de ejemplo
+ * 3. Pégala abajo, reemplazando PASTE_YOUR_WEB3FORMS_ACCESS_KEY_HERE
  */
-export const WEB3FORMS_ACCESS_KEY = 'YOUR_WEB3FORMS_ACCESS_KEY_HERE';
+export const WEB3FORMS_ACCESS_KEY = 'PASTE_YOUR_WEB3FORMS_ACCESS_KEY_HERE';
 
 /**
  * GALLERY / GALERÍA
- * Placeholder SVGs live in /public/gallery/. To use real photos, copy them into
- * /public/gallery/ and change `src` (e.g. '/gallery/kitchen.jpg').
- * Para usar fotos reales, cópialas a /public/gallery/ y cambia `src`.
- * The captions are in src/i18n.ts → gallery.items
+ * Sample SVGs live in /public/gallery/. To use real photos:
+ *   1. Copy the photos to /public/gallery/  (e.g. kitchen-brickell.jpg)
+ *   2. Change `src` below (e.g. '/gallery/kitchen-brickell.jpg')
+ *   3. Captions (EN/ES) are in src/i18n.ts → gallery.items
+ * Para usar fotos reales: cópialas a /public/gallery/ y cambia `src` aquí.
  */
 export const GALLERY = [
   { src: '/gallery/interior-living-room.svg', key: 'livingRoom' },
