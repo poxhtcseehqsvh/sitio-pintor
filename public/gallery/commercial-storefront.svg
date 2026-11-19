@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <rect width="800" height="600" fill="#ffe2b8"/>
+  <rect y="520" width="800" height="80" fill="#b5b5b5"/>
+  <rect x="60" y="90" width="680" height="430" fill="#fff"/>
+  <rect x="60" y="90" width="680" height="90" fill="#1a2b5e"/>
+  <text x="400" y="150" text-anchor="middle" font-family="Arial, sans-serif" font-size="46" font-weight="800" fill="#fff">CAFE · MIAMI</text>
+  <path d="M60 180 h680 v50 H60z" fill="#cc0000"/>
+  <path d="M128 180 h68 v50 h-68z M264 180 h68 v50 h-68z M400 180 h68 v50 h-68z M536 180 h68 v50 h-68z M672 180 h68 v50 h-68z" fill="#fff"/>
+  <rect x="100" y="270" width="260" height="200" fill="#9fd3f5" stroke="#006400" stroke-width="10"/>
+  <rect x="440" y="270" width="120" height="250" fill="#006400"/>
+  <rect x="455" y="285" width="90" height="140" fill="#9fd3f5"/>
+  <rect x="600" y="270" width="110" height="200" fill="#9fd3f5" stroke="#006400" stroke-width="10"/>
+  <path d="M100 520 v-30 a24 24 0 0 1 48 0 v30z M660 520 v-30 a24 24 0 0 1 48 0 v30z" fill="#3e8e3e"/>
+</svg>

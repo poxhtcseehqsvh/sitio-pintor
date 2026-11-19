@@ -1,23 +1,21 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { DICT } from '../i18n';
+const en = DICT.en.notFound;
+const es = DICT.es.notFound;
 ---
 
-<Layout titulo="Página no encontrada" descripcion="La página que busca no existe.">
-  <section class="contenedor no-encontrada">
-    <p class="etiqueta">Error 404</p>
-    <h1>Esta pared aún no está pintada</h1>
-    <p>La página que busca no existe o cambió de lugar.</p>
-    <a class="boton" href="/">Volver al inicio</a>
-  </section>
+<Layout lang="en" title="404 | Rizzo Ditalia Painting" description={en.text} noindex>
+  <div class="tricolor" aria-hidden="true"><span></span><span></span><span></span></div>
+  <main class="not-found container">
+    <img src="/logo-mark.svg" alt="" width="72" height="72" />
+    <h1>404</h1>
+    <h2>{en.title}</h2>
+    <p>{en.text}</p>
+    <a class="btn btn--red" href="/">{en.back}</a>
+    <hr />
+    <h2 lang="es">{es.title}</h2>
+    <p lang="es">{es.text}</p>
+    <a class="btn btn--navy" href="/es/" lang="es">{es.back}</a>
+  </main>
 </Layout>
-
-<style>
-  .no-encontrada {
-    text-align: center;
-    padding-block: clamp(5rem, 15vw, 10rem);
-  }
-  .no-encontrada p:not(.etiqueta) {
-    color: var(--tinta-suave);
-    margin-bottom: 2rem;
-  }
-</style>

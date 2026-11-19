@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <rect width="800" height="600" fill="#f4f6fb"/>
+  <rect width="800" height="420" fill="#ffffff"/>
+  <rect width="800" height="70" fill="#e2e6ef"/>
+  <rect y="230" width="800" height="190" fill="#1a2b5e"/>
+  <rect y="222" width="800" height="10" fill="#cc0000"/>
+  <rect y="420" width="800" height="180" fill="#8d949f"/>
+  <g fill="#cfd8ea"><rect x="60" y="100" width="160" height="100" rx="4"/><rect x="320" y="100" width="160" height="100" rx="4"/><rect x="580" y="100" width="160" height="100" rx="4"/></g>
+  <rect x="150" y="380" width="500" height="22" rx="4" fill="#d8b98c"/>
+  <rect x="170" y="402" width="14" height="110" fill="#555"/><rect x="616" y="402" width="14" height="110" fill="#555"/>
+  <g fill="#006400"><rect x="200" y="320" width="70" height="60" rx="12"/><rect x="365" y="320" width="70" height="60" rx="12"/><rect x="530" y="320" width="70" height="60" rx="12"/></g>
+  <rect x="250" y="340" width="40" height="30" rx="3" fill="#333"/><rect x="510" y="340" width="40" height="30" rx="3" fill="#333"/>
+  <path d="M700 420 v-80 a28 28 0 0 1 56 0 v80z" fill="#3e8e3e"/>
+</svg>
